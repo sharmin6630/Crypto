@@ -1,0 +1,26 @@
+package Crypto;
+
+import java.util.Scanner;
+
+public class Main {
+
+	public static RSAMode obj = new RSAMode();
+	public static RSASignature sign = new RSASignature();
+	public static void main(String[] args) throws Exception {
+		Scanner sc = new Scanner(System.in);
+		System.out.print("Enter 1 for AES or 2 for RSA: ");
+		int opt = sc.nextInt();
+		if(opt == 1) {
+			AESMode.AES();
+		}
+		else if(opt == 2)
+			obj.startRSA(1024);
+		
+		else {
+			sign.startRSASignature();
+		}
+		
+		
+	}
+
+}

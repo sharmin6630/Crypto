@@ -1,0 +1,18 @@
+package Crypto;
+
+import java.util.Scanner;
+
+public class Main {
+
+	public static RSAMode obj = new RSAMode();
+	public static void main(String[] args) throws Exception {
+//		Scanner sc = new Scanner(System.in);
+//		System.out.println("Enter 1 for AES: ");
+//		int opt = sc.nextInt();
+//		if(opt == 1) {
+//			AESMode.AES();
+//		}
+		obj.startRSA(1024);
+	}
+
+}

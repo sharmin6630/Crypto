@@ -1,0 +1,32 @@
+package Crypto;
+
+import java.util.Scanner;
+
+public class Main {
+
+	public static RSAMode obj = new RSAMode();
+	public static RSASignature obj2 = new RSASignature();
+	public static SHA256 obj3 = new SHA256();
+	public static void main(String[] args) throws Exception, NullPointerException{
+		Scanner sc = new Scanner(System.in);
+		System.out.print("Enter 1 for AES or 2 for RSA 3 for RSA Signature 4 for SHA-256 hashing: ");
+		int opt = sc.nextInt();
+		sc.close();
+		if(opt == 1) {
+			AESMode.AES();
+		}
+		else if(opt == 2)
+			obj.startRSA(1024);
+		
+		else if (opt == 3){
+			obj2.startRSASignature();
+		}
+		
+		else if(opt == 4) {
+			obj3.startSHA();
+		}
+		
+		
+	}
+
+}

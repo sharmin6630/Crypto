@@ -1,0 +1,196 @@
+package Crypto;
+
+
+import java.security.KeyFactory;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SecureRandom;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
+import java.util.Scanner;
+import java.util.stream.Stream;
+import javax.crypto.Cipher;
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.IvParameterSpec;
+import javax.xml.bind.DatatypeConverter;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths; 
+
+public class RSAMode {
+	
+	private PublicKey publicKey;
+	private PrivateKey privateKey;
+	static RSAMode obj;
+	
+	// key
+	public KeyPair createRSAKey(String filePKey, String fileSKey, int bit) throws Exception{
+		
+		File filePK = new File(filePKey);
+		File fileSK = new File(fileSKey);
+		int byteSize = bit/8;
+	    
+	    //Saving or Retrieving key
+        if (filePK.createNewFile() && fileSK.createNewFile()) {
+        	SecureRandom securerandom = new SecureRandom();
+    		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
+    		keyPairGenerator.initialize(bit, securerandom);
+    		KeyPair keyPair = keyPairGenerator.generateKeyPair();
+            this.privateKey = keyPair.getPrivate();
+            this.publicKey = keyPair.getPublic();
+            
+            System.out.println("RSA Public and private Key File has been created...");
+    	    try{      
+    	        byte[] data = publicKey.getEncoded();
+    	        FileOutputStream fos = new FileOutputStream(filePK);
+    	        fos.write(data);   
+    	        fos.close();
+    	        
+    	        byte[] data2 = privateKey.getEncoded();
+    	        FileOutputStream fos2 = new FileOutputStream(fileSK);
+    	        fos2.write(data2);   
+    	        fos2.close();
+    	        
+    	    }catch(Exception e){
+    	    	System.out.println(e);}    
+    	    System.out.println("RSA key write Success...");  
+    	    return keyPair;
+    	
+       }
+        
+       else {
+           System.out.println("RSA Public key file has been read.");
+           KeyPair keyPair;
+           
+           byte[] keyByte = new byte[byteSize];
+           FileInputStream fin = new FileInputStream(filePK);
+           fin.read(keyByte);
+           
+           X509EncodedKeySpec spec = new X509EncodedKeySpec(keyByte);
+           KeyFactory kf = KeyFactory.getInstance("RSA");
+           System.out.println(kf.generatePublic(spec));
+           PublicKey pub = kf.generatePublic(spec);
+           System.out.println(pub);
+           this.publicKey = pub;
+           fin.close();
+           
+           byte[] keyByte2 = new byte[byteSize];
+           FileInputStream fin2 = new FileInputStream(fileSK);
+           fin.read(keyByte2);
+           
+
+           PKCS8EncodedKeySpec spec2 = new PKCS8EncodedKeySpec(keyByte2);
+           KeyFactory kf2 = KeyFactory.getInstance("RSA");
+           PrivateKey pri = kf2.generatePrivate(spec2);
+           //this.privateKey = pri;
+           fin2.close();
+           
+           return new KeyPair(pub,pri);
+           
+       }
+        
+	}
+	
+	// RSA Encryption
+	public byte[] do_RSAEncryption(String plainText, PrivateKey privateKey) throws Exception{
+		Cipher cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.ENCRYPT_MODE, privateKey);
+        return cipher.doFinal(plainText.getBytes());
+	}
+	
+	
+	// RSA Decryption
+	public String do_RSADecryption(byte[] cipherText, PublicKey publicKey) throws Exception{
+        Cipher cipher = Cipher.getInstance("RSA");
+        cipher.init(Cipher.DECRYPT_MODE, publicKey);
+        byte[] result = cipher.doFinal(cipherText);
+        return new String(result);
+	}
+
+	
+	
+	private static String readLines(String filePath) {
+        StringBuilder contentBuilder = new StringBuilder();
+        try (Stream<String> stream = Files.lines( Paths.get(filePath), StandardCharsets.UTF_8)) {
+            stream.forEach(s -> contentBuilder.append(s).append("\n"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+ 
+        return contentBuilder.toString();
+    }
+	
+	public static void saveEncrypted(byte[] cipherText, String fileName) throws IOException {
+		File file = new File(fileName);
+		
+        if (file.createNewFile()) {
+            System.out.println("Encrypted File has been created.");
+    	    try{      
+    	        FileOutputStream fos = new FileOutputStream(fileName);
+    	        fos.write(cipherText);   
+    	        fos.close();
+    	    }catch(Exception e){
+    	    	System.out.println(e);
+    	    }       
+       }  
+       else {
+           System.out.println("Encryption file already exists."+ file);
+       }
+	}
+	
+	public static byte[] readEncrypted(String fileName) throws IOException {
+        FileInputStream fin = new FileInputStream(fileName);
+        byte[] textbyte = new byte[fin.available()];
+        fin.read(textbyte);
+        fin.close();
+        return textbyte;
+	}
+	
+	public PublicKey getPublicKey() {
+		System.out.println(publicKey);
+		return this.publicKey;
+	}
+	
+	public PrivateKey getPrivateKey() {
+		return this.privateKey;
+	}
+	
+	
+	public void startRSA(int bit) throws Exception {
+		
+		KeyPair kp = createRSAKey("RSA_" + Integer.toString(bit) + "_PublicKey.txt", "RSA_" + Integer.toString(bit) + "_PrivateKey.txt", bit);
+		
+		PublicKey pbKey = getPublicKey();
+		PrivateKey sbKey = getPrivateKey();
+		
+	    System.out.println("The Public Key is :" + DatatypeConverter.printHexBinary(pbKey.getEncoded()));
+	    System.out.println("The Private Key is :" + DatatypeConverter.printHexBinary(sbKey.getEncoded()));
+	    
+	    String plainText = readLines("Message.txt");
+	    System.out.println(plainText);
+	    
+	
+	    // Encrypting the message
+	    byte[] cipherText = do_RSAEncryption(plainText, sbKey);
+	    saveEncrypted(cipherText, "RSA_" + Integer.toString(bit) + "_Encrypted.txt");
+	
+	    System.out.println("The ciphertext or " + "Encrypted Message is: " + DatatypeConverter.printHexBinary(cipherText));
+	
+	    // Decrypting the encrypted message
+	    byte[] raw = readEncrypted("RSA_" + Integer.toString(bit) + "_Encrypted.txt");
+	    String decryptedText = do_RSADecryption(raw, pbKey);
+	
+	    System.out.println("Your original message is: "+ decryptedText);
+		
+	}
+	
+
+}
