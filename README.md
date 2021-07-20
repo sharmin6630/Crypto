@@ -2,14 +2,14 @@
 
 ### Programming Symmetric & Asymmetric Crypto
 
- 1. Program Functionalities:
+ **1. Program Functionalities:**
   - AES encryption and decryption ECB mode (128/192/256)
   - AES encryption and decryption CFB mode (128/192/256)
   - RSA encryption and decryption (1024/2048/4096)
   - RSA Signature and Verification (1024/2048/4096)
   - SHA256 HASH
 
- 2. Execution Details:
+ **2. Execution Details:**
   - User will be given the option for AES/RSA/RSA Signature/SHA-256 Hash/quit for different keys (1-5). 
 
    ![](https://github.com/sharmin6630/Security_Lab_Assignments/blob/main/1.png)
